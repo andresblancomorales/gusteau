@@ -237,6 +237,15 @@ describe('TokenManagement', () => {
     expect(isActive).to.be.true;
   });
 
+  it('should try to revoke a session and throw a ValidationException if a different type is sent as a paramter', done => {
+    tokenManagement.revokeToken({})
+      .catch(error => {
+        expect(error.name).to.equal(ValidationException.Name);
+        expect(error.fields).to.deep.equal(['access_token']);
+        done();
+      });
+  });
+
   it('should try to revoke a session and return false if a tokens session was already expired', async () => {
     let isActive = await tokenManagement.revokeToken('3xp1r3d');
 

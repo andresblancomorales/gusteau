@@ -76,6 +76,9 @@ export default class TokenManagement {
   }
 
   async revokeToken(token) {
+    if (typeof token !== 'string') {
+      return Promise.reject(new ValidationException(['access_token']));
+    }
     try {
       let userDetails = await jwt.verifyToken(token);
 

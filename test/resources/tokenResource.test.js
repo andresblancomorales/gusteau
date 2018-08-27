@@ -19,8 +19,17 @@ describe('TokenResource', () => {
 
     let tokenManagement = {
       createToken: () => {
+      },
+      revokeToken: () => {
+
       }
     };
+
+    sinon.stub(tokenManagement, 'revokeToken')
+      .withArgs('70k3n')
+      .returns(Promise.resolve(true))
+      .withArgs({})
+      .returns(Promise.reject(new ValidationException(['access_token'])));
 
     sinon.stub(tokenManagement, 'createToken')
       .withArgs({
@@ -207,5 +216,25 @@ describe('TokenResource', () => {
         client_id: 'gusteau'
       })
       .expect(500, done);
-  })
+  });
+
+  it('should try to revoke a token and return OK', done => {
+    request(app)
+      .delete('/token')
+      .set('Content-Type', 'application/json')
+      .send({
+        access_token: '70k3n'
+      })
+      .expect(200, done);
+  });
+
+  it('should try to revoke a token and return BadRequest if there is a validation exception', done => {
+    request(app)
+      .delete('/token')
+      .set('Content-Type', 'application/json')
+      .send({
+        access_token: {}
+      })
+      .expect(400, done);
+  });
 });
