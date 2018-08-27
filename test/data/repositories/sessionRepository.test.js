@@ -1,5 +1,6 @@
 import SessionRepository from '../../../src/data/repositories/sessionRepository';
 import {Schema} from "mongoose";
+import {ClientNotFoundException} from "../../../src/utils/exceptions";
 
 describe('SessionRepository', () => {
   let repository;
@@ -32,4 +33,73 @@ describe('SessionRepository', () => {
 
     done();
   });
+
+  it('should check if a session is active and return true if it is', async () => {
+    sinon.stub(repository.Model, 'count')
+      .withArgs({
+        userId: '1234',
+        expirationDate: {$gt: 1000},
+        token: '70k3n',
+        state: 'Valid'
+      })
+      .returns(Promise.resolve(1));
+
+    let result = await repository.isSessionActive('1234', '70k3n', 1000);
+
+    repository.Model.count.restore();
+    expect(result).to.be.true;
+  });
+
+  it('should check if a session is active and return false if it isnt', async () => {
+    sinon.stub(repository.Model, 'count')
+      .withArgs({
+        userId: '1234',
+        expirationDate: {$gt: 1000},
+        token: '70k3n',
+        state: 'Valid'
+      })
+      .returns(Promise.resolve(0));
+
+    let result = await repository.isSessionActive('1234', '70k3n', 1000);
+
+    repository.Model.count.restore();
+    expect(result).to.be.false;
+  });
+
+  it('should revoke an active token and return true if successful', async () => {
+    sinon.stub(repository.Model, 'updateOne')
+      .withArgs({
+        userId: '1234',
+        expirationDate: {$gt: 1000},
+        token: '70k3n',
+        state: 'Valid'
+      }, {
+        state: 'Revoked'
+      })
+      .returns(Promise.resolve({nModified: 1}));
+
+    let result = await repository.revokeActiveToken('1234', '70k3n', 1000);
+
+    repository.Model.updateOne.restore();
+    expect(result).to.be.true;
+  });
+
+  it('should try to revoke an active token and return false if it failed', async () => {
+    sinon.stub(repository.Model, 'updateOne')
+      .withArgs({
+        userId: '1234',
+        expirationDate: {$gt: 1000},
+        token: '70k3n',
+        state: 'Valid'
+      }, {
+        state: 'Revoked'
+      })
+      .returns(Promise.resolve({nModified: 0}));
+
+    let result = await repository.revokeActiveToken('1234', '70k3n', 1000);
+
+    repository.Model.updateOne.restore();
+    expect(result).to.be.false;
+  })
+
 });

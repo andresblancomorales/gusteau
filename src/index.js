@@ -11,6 +11,7 @@ import UsersResource from './resources/usersResource';
 import TokenResource from './resources/tokenResource';
 import * as cryptography from './utils/cryptography';
 import logger from './utils/logger';
+// import * as utils from './utils/utilities';
 
 connection.then(error => {
   if (error) {
@@ -37,6 +38,12 @@ let sessionRepository = new SessionRepository();
 let tokenManagement = new TokenManagement(userRepository, clientRepository, sessionRepository, cryptography);
 let tokenResource = new TokenResource(tokenManagement);
 tokenResource.register(app);
+
+// sessionRepository.revokeActiveToken('5b84609a9daa1f427e16b35b', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WyJjaGVmIl0sIl9pZCI6IjViODQ2MDlhOWRhYTFmNDI3ZTE2YjM1YiIsImZpcnN0TmFtZSI6IkFuZHJlcyIsImxhc3ROYW1lIjoiQmxhbmNvIiwidXNlcm5hbWUiOiJhbmRyZXMuYmxhbmNvQG90aHJlZS5pbyIsImVtYWlsIjoiYW5kcmVzLmJsYW5jb0BvdGhyZWUuaW8iLCJpYXQiOjE1MzU0MDUzNzU1NTksImV4cCI6MTUzNTQwNTQzNTU1OSwiaXNzIjoiZ3VzdGVhdSJ9.UW5nPchlsEixjTNunX9QAb0jfpO0DsQc6Rp6QWI8ygY', utils.getUTCNow()).then(sessions => {
+//   logger.info("FOUND ACTIVE SESSIONS!", sessions);
+// }).catch(error => {
+//     logger.error("blew up", error)
+//   });
 
 
 // const security = (req, res, next) => {

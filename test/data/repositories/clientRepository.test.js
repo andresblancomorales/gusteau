@@ -60,6 +60,7 @@ describe('ClientRepository', () => {
       .catch(error => {
         expect(error.name).to.equal(ClientNotFoundException.Name);
         expect(error.client).to.equal('notExistent');
+
         repository.Model.findOne.restore();
         done();
       });

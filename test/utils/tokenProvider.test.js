@@ -2,7 +2,7 @@ import * as jwt from '../../src/utils/tokenProvider';
 import * as utilities from '../../src/utils/utilities';
 import {InvalidTokenException} from "../../src/utils/exceptions";
 
-describe('TokenProider', () => {
+describe('TokenProvider', () => {
 
   before(done => {
 

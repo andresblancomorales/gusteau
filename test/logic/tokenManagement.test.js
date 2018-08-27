@@ -26,7 +26,6 @@ describe('TokenManagement', () => {
 
     sinon.stub(jwt, 'createToken')
       .withArgs({
-
         _id: '1234',
         firstName: 'Andres',
         lastName: 'Blanco',
@@ -39,6 +38,19 @@ describe('TokenManagement', () => {
         redirectUrl: 'http://www.gusteau.com',
         tokenTtl: 60,
       }).returns(Promise.resolve('70k3n'));
+
+    sinon.stub(jwt, 'verifyToken')
+      .withArgs('70k3n')
+      .returns(Promise.resolve({
+        _id: '1234'
+      }))
+      .withArgs('3xp1r3d')
+      .returns(Promise.resolve({
+        _id: '1234'
+      }))
+      .withArgs('b4d')
+      .returns(Promise.reject(new Error('POW!')));
+
 
     let userRepository = new UserRepository();
     sinon.stub(userRepository, 'getByUsername')
@@ -85,6 +97,30 @@ describe('TokenManagement', () => {
       expirationDate: 1060,
       state: 'Valid'
     });
+    sinon.stub(sessionRepository, 'isSessionActive')
+      .withArgs(
+        '1234',
+        '70k3n',
+        1000
+      )
+      .returns(Promise.resolve(true))
+      .withArgs(
+        '1234',
+        '3xp1r3d',
+        1000
+      ).returns(Promise.resolve(false));
+    sinon.stub(sessionRepository, 'revokeActiveToken')
+      .withArgs(
+        '1234',
+        '70k3n',
+        1000
+      )
+      .returns(Promise.resolve(true))
+      .withArgs(
+        '1234',
+        '3xp1r3d',
+        1000
+      ).returns(Promise.resolve(false));
 
     tokenManagement = new TokenManagement(userRepository, clientRepository, sessionRepository, cryptography);
 
@@ -95,6 +131,7 @@ describe('TokenManagement', () => {
     utils.getUTCNow.restore();
     cryptography.isPasswordValid.restore();
     jwt.createToken.restore();
+    jwt.verifyToken.restore();
   });
 
   it('should create a new session and return the generated token along with it', async () => {
@@ -175,4 +212,41 @@ describe('TokenManagement', () => {
       done();
     });
   });
+
+  it('should check if a session is active and return true if it is', async () => {
+    let isActive = await tokenManagement.isSessionActive('70k3n');
+
+    expect(isActive).to.be.true;
+  });
+
+  it('should check if a session is active and return false if it is not', async () => {
+    let isActive = await tokenManagement.isSessionActive('3xp1r3d');
+
+    expect(isActive).to.be.false;
+  });
+
+  it('should check if a session is active and return false if the jwt validation fails', async () => {
+    let isActive = await tokenManagement.isSessionActive('b4d');
+
+    expect(isActive).to.be.false;
+  });
+
+  it('should revoke a session and return true if successful', async () => {
+    let isActive = await tokenManagement.revokeToken('70k3n');
+
+    expect(isActive).to.be.true;
+  });
+
+  it('should try to revoke a session and return false if a tokens session was already expired', async () => {
+    let isActive = await tokenManagement.revokeToken('3xp1r3d');
+
+    expect(isActive).to.be.false;
+  });
+
+  it('should try to revoke a session and return false if the jwt verification fails', async () => {
+    let isActive = await tokenManagement.revokeToken('b4d');
+
+    expect(isActive).to.be.false;
+  });
+
 });
