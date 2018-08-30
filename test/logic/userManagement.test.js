@@ -17,10 +17,12 @@ describe('UserManagement', () => {
         roles: ['chef']
       })
       .returns(Promise.resolve({
+        _id: '1234',
         firstName: 'Andres',
         lastName: 'Blanco',
         username: 'andres@email.com',
         email: 'andres@email.com',
+        password: 'p455w0rd',
         roles: ['chef']
       }));
 
@@ -57,6 +59,7 @@ describe('UserManagement', () => {
     });
 
     expect(createdUser).to.deep.equal({
+      _id: '1234',
       firstName: 'Andres',
       lastName: 'Blanco',
       username: 'andres@email.com',

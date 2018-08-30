@@ -32,6 +32,15 @@ export default class UserManagement {
       roles: DEFAULT_ROLES
     };
 
-    return this.userRepository.save(newUser);
+    return this.userRepository.save(newUser).then(u => {
+      return {
+        _id: u._id,
+        firstName: u.firstName,
+        lastName: u.lastName,
+        username: u.username,
+        email: u.email,
+        roles: u.roles
+      }
+    });
   }
 }
