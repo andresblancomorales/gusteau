@@ -18,6 +18,7 @@ services:
       - GUSTEAU_LOG_LEVEL=info
       - GUSTEAU_JWT_SECRET=53cr37
       - GUSTEAU_JWT_ISSUER=gusteau
+      - GUSTEAU_LOG_FILE_PATH=/var/log/gusteau/output.log
     ports:
       - "81:3000"
     links:
