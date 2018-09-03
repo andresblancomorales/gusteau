@@ -19,6 +19,7 @@ services:
       - GUSTEAU_JWT_SECRET=53cr37
       - GUSTEAU_JWT_ISSUER=gusteau
       - GUSTEAU_LOG_FILE_PATH=/var/log/gusteau/output.log
+      - GUSTEAU_QUERY_LIMIT=10
     ports:
       - "81:3000"
     links:
