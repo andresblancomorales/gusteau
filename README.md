@@ -29,4 +29,4 @@ docker-compose up
 
 It will set you up a MongoDb initialized with a default *Client*. See [setup.js](./mongo/setup.js)
 
-Mongo will be running on port 27017 and Gusteau on port 81
+*Mongo* will be running on port 27017 and *Gusteau* on port 81
