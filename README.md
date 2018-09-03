@@ -14,10 +14,11 @@ To get it running make sure you setup the environment variables or a .env file a
 
 Then run:
 ```bash
+npm install
 npm run dev
 ```
 
-Done? Your service should be running on your configure port.
+Done? Your service should be running on your configured port.
 
 ### Run it with Docker
 
