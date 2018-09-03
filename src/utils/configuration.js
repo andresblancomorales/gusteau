@@ -37,6 +37,7 @@ class Configuration {
     this.LOG_LEVEL = loadVariable('GUSTEAU_LOG_LEVEL');
     this.JWT_SECRET = loadVariable('GUSTEAU_JWT_SECRET');
     this.JWT_ISSUER = loadVariable('GUSTEAU_JWT_ISSUER');
+    this.QUERY_LIMIT = Number(loadVariable('GUSTEAU_QUERY_LIMIT'));
   }
 }
 

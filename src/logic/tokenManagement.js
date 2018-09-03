@@ -1,4 +1,9 @@
-import {AuthenticationException, NotSupportedGrantTypeException, ValidationException} from "../utils/exceptions";
+import {
+  AuthenticationException,
+  InvalidTokenException,
+  NotSupportedGrantTypeException,
+  ValidationException
+} from "../utils/exceptions";
 import {isDefined, getUTCNow} from '../utils/utilities';
 import * as jwt from '../utils/tokenProvider';
 import log from '../utils/logger';
@@ -68,10 +73,19 @@ export default class TokenManagement {
     try {
       let userDetails = await jwt.verifyToken(token);
 
-      return this.sessionRepository.isSessionActive(userDetails._id, token, getUTCNow());
+      let isActive = await this.sessionRepository.isSessionActive(userDetails._id, token, getUTCNow());
+      if (!isActive) {
+        throw new InvalidTokenException();
+      }
+
+      return userDetails;
     } catch(error) {
       log.warn('Failed to check if session was active');
-      return false;
+      if (error.name !== InvalidTokenException.Name) {
+        throw new InvalidTokenException();
+      } else {
+        throw error;
+      }
     }
   }
 

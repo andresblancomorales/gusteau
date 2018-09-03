@@ -11,6 +11,7 @@ describe('Configuration', () => {
     expect(Configuration.LOG_LEVEL).to.equal('debug');
     expect(Configuration.JWT_SECRET).to.equal('53cr37');
     expect(Configuration.JWT_ISSUER).to.equal('gusteau');
+    expect(Configuration.QUERY_LIMIT).to.equal(10);
 
     done();
   });

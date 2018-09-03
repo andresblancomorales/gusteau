@@ -1,5 +1,4 @@
 import express from 'express';
-//import {isDefined} from './utils/utilities';
 import Configuration from './utils/configuration';
 import connection from './data/connection';
 import UserRepository from './data/repositories/userRepository';
@@ -11,7 +10,10 @@ import UsersResource from './resources/usersResource';
 import TokenResource from './resources/tokenResource';
 import * as cryptography from './utils/cryptography';
 import logger from './utils/logger';
-// import * as utils from './utils/utilities';
+import RecipeRepository from './data/repositories/recipeRepository';
+import RecipeManagement from './logic/recipeManagement';
+import RecipesResource from "./resources/recipesResource";
+import AuthorizationMiddleware from "./resources/middlewares/securityMiddleware";
 
 connection.then(error => {
   if (error) {
@@ -43,6 +45,13 @@ let sessionRepository = new SessionRepository();
 let tokenManagement = new TokenManagement(userRepository, clientRepository, sessionRepository, cryptography);
 let tokenResource = new TokenResource(tokenManagement);
 tokenResource.register(app);
+
+let authorizationMiddleware = new AuthorizationMiddleware(tokenManagement);
+
+let recipeRepository = new RecipeRepository();
+let recipeManagement = new RecipeManagement(recipeRepository);
+let recipesResource = new RecipesResource(recipeManagement, authorizationMiddleware.middleWare);
+recipesResource.register(app);
 
 // sessionRepository.revokeActiveToken('5b84609a9daa1f427e16b35b', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WyJjaGVmIl0sIl9pZCI6IjViODQ2MDlhOWRhYTFmNDI3ZTE2YjM1YiIsImZpcnN0TmFtZSI6IkFuZHJlcyIsImxhc3ROYW1lIjoiQmxhbmNvIiwidXNlcm5hbWUiOiJhbmRyZXMuYmxhbmNvQG90aHJlZS5pbyIsImVtYWlsIjoiYW5kcmVzLmJsYW5jb0BvdGhyZWUuaW8iLCJpYXQiOjE1MzU0MDUzNzU1NTksImV4cCI6MTUzNTQwNTQzNTU1OSwiaXNzIjoiZ3VzdGVhdSJ9.UW5nPchlsEixjTNunX9QAb0jfpO0DsQc6Rp6QWI8ygY', utils.getUTCNow()).then(sessions => {
 //   logger.info("FOUND ACTIVE SESSIONS!", sessions);

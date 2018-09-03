@@ -4,7 +4,7 @@ import SessionRepository from '../../src/data/repositories/sessionRepository';
 import TokenManagement from '../../src/logic/tokenManagement';
 import {
   AuthenticationException,
-  ClientNotFoundException,
+  ClientNotFoundException, InvalidTokenException,
   NotSupportedGrantTypeException,
   UserNotFoundException, ValidationException
 } from "../../src/utils/exceptions";
@@ -214,21 +214,27 @@ describe('TokenManagement', () => {
   });
 
   it('should check if a session is active and return true if it is', async () => {
-    let isActive = await tokenManagement.isSessionActive('70k3n');
+    let session = await tokenManagement.isSessionActive('70k3n');
 
-    expect(isActive).to.be.true;
+    expect(session).to.deep.equal({
+      _id: '1234'
+    });
   });
 
-  it('should check if a session is active and return false if it is not', async () => {
-    let isActive = await tokenManagement.isSessionActive('3xp1r3d');
-
-    expect(isActive).to.be.false;
+  it('should check if a session is active and return false if it is not', done => {
+    tokenManagement.isSessionActive('3xp1r3d')
+      .catch(error => {
+        expect(error.name).to.deep.equal(InvalidTokenException.Name);
+        done();
+      });
   });
 
   it('should check if a session is active and return false if the jwt validation fails', async () => {
-    let isActive = await tokenManagement.isSessionActive('b4d');
-
-    expect(isActive).to.be.false;
+    tokenManagement.isSessionActive('b4d')
+      .catch(error => {
+        expect(error.name).to.deep.equal(InvalidTokenException.Name);
+        done();
+      });
   });
 
   it('should revoke a session and return true if successful', async () => {
