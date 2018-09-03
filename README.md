@@ -1,4 +1,4 @@
-![Gusteau](./docs/images/gusteau.jpg | width=100)
+![Gusteau](./docs/images/gusteau.jpg)
 # Gusteau
 
 A cookbook service.
