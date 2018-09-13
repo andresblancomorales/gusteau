@@ -48,6 +48,12 @@ RecipeSchema.statics.getRecipes = async function (offsetRecipe, limit) {
   return this.find({_id: {$lt: offsetRecipe}}).limit(limit).populate('user').sort({_id: -1});
 };
 
+RecipeSchema.statics.exists = function (recipeName) {
+  return this.count({name: new RegExp(recipeName, 'i')}).then(count => {
+    return Promise.resolve(count > 0)
+  })
+};
+
 const Recipe = mongoose.model('Recipe', RecipeSchema);
 
 export default class RecipeRepository extends BaseRepository {
@@ -62,6 +68,15 @@ export default class RecipeRepository extends BaseRepository {
       return await this.Model.getRecipes(offsetRecipe, limit);
     } catch (error) {
       log.error(`Failed to get recipes. Offset: ${offsetRecipe}. Limit ${limit}`, error);
+      return Promise.reject(ex.transform(error));
+    }
+  }
+
+  async exists(name) {
+    try {
+      return await this.Model.exists(name);
+    } catch (error) {
+      log.error(`Failed to check recipe existence for name ${name}`, error);
       return Promise.reject(ex.transform(error));
     }
   }

@@ -4,8 +4,10 @@ import connection from './data/connection';
 import UserRepository from './data/repositories/userRepository';
 import ClientRepository from './data/repositories/clientRepository';
 import SessionRepository from './data/repositories/sessionRepository';
+import CategoryRepository from "./data/repositories/categoryRepository";
 import UserManagement from './logic/userManagement';
 import TokenManagement from './logic/tokenManagement';
+import CategoryManagement from './logic/categoryManagement';
 import UsersResource from './resources/usersResource';
 import TokenResource from './resources/tokenResource';
 import * as cryptography from './utils/cryptography';
@@ -14,6 +16,7 @@ import RecipeRepository from './data/repositories/recipeRepository';
 import RecipeManagement from './logic/recipeManagement';
 import RecipesResource from "./resources/recipesResource";
 import AuthorizationMiddleware from "./resources/middlewares/securityMiddleware";
+import CategoriesResource from "./resources/categoriesResource";
 
 connection.then(error => {
   if (error) {
@@ -31,7 +34,8 @@ const app = express();
 app.use(express.json());
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.header("Access-Control-Allow-Methods", "POST, PUT, DELETE, GET");
   next();
 });
 
@@ -53,24 +57,10 @@ let recipeManagement = new RecipeManagement(recipeRepository);
 let recipesResource = new RecipesResource(recipeManagement, authorizationMiddleware.middleWare);
 recipesResource.register(app);
 
-// sessionRepository.revokeActiveToken('5b84609a9daa1f427e16b35b', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WyJjaGVmIl0sIl9pZCI6IjViODQ2MDlhOWRhYTFmNDI3ZTE2YjM1YiIsImZpcnN0TmFtZSI6IkFuZHJlcyIsImxhc3ROYW1lIjoiQmxhbmNvIiwidXNlcm5hbWUiOiJhbmRyZXMuYmxhbmNvQG90aHJlZS5pbyIsImVtYWlsIjoiYW5kcmVzLmJsYW5jb0BvdGhyZWUuaW8iLCJpYXQiOjE1MzU0MDUzNzU1NTksImV4cCI6MTUzNTQwNTQzNTU1OSwiaXNzIjoiZ3VzdGVhdSJ9.UW5nPchlsEixjTNunX9QAb0jfpO0DsQc6Rp6QWI8ygY', utils.getUTCNow()).then(sessions => {
-//   logger.info("FOUND ACTIVE SESSIONS!", sessions);
-// }).catch(error => {
-//     logger.error("blew up", error)
-//   });
-
-
-// const security = (req, res, next) => {
-//   if (isDefined(req.header("Authorization"))) {
-//     next();
-//   } else {
-//     res.status(401);
-//     res.json({error: 'AuthorizationHeaderMissing', description: 'The Basic Authorization Header is Missing'});
-//   }
-// };
-
-// app.post('/', [security, getHelloWorld]);
-
+let categoryRepository = new CategoryRepository();
+let categoryManagement = new CategoryManagement(categoryRepository);
+let categoriesResource = new CategoriesResource(categoryManagement, authorizationMiddleware.middleWare);
+categoriesResource.register(app);
 
 app.listen(Configuration.SERVICE_PORT, () => {
 });

@@ -7,6 +7,15 @@ export class ValidationException extends Error {
 }
 ValidationException.Name = 'ValidationException';
 
+export class RecipeExistsException extends Error {
+  constructor(recipeName) {
+    super(`Recipe ${recipeName} already exists`);
+    this.name = RecipeExistsException.Name;
+    this.recipeName = recipeName;
+  }
+}
+RecipeExistsException.Name = 'RecipeExistsException';
+
 export class NotImplementedException extends Error {
   constructor(method) {
     super(`${method} not implemented`);

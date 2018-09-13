@@ -32,6 +32,7 @@ export default class UsersResource extends BaseResource {
             break;
           default:
             response.status(500);
+            response.end();
             break;
         }
       });

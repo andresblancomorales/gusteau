@@ -1,7 +1,6 @@
 import RecipeRepository from '../../../src/data/repositories/recipeRepository';
 import {Schema} from "mongoose";
 
-
 describe('RecipeRepository', () => {
 
   let repository;
@@ -17,6 +16,7 @@ describe('RecipeRepository', () => {
     expect(model.modelName).to.equal('Recipe');
     expect(model.schema).to.equal(repository.Schema);
     expect(typeof model.getRecipes).to.equal('function');
+    expect(typeof model.exists).to.equal('function');
 
     done();
   });
@@ -98,6 +98,30 @@ describe('RecipeRepository', () => {
     repository.Model.find.restore();
 
     expect(result).to.deep.equal([{_id: '002', name: 'Nice recipe'}]);
+  });
+
+  it('should check if a recipe exists and return true if it does', async () => {
+    sinon.stub(repository.Model, "count")
+      .withArgs({name: new RegExp('Rice n Beans', 'i')})
+      .returns(Promise.resolve(1));
+
+    let result = await repository.exists('Rice n Beans');
+
+    repository.Model.count.restore();
+
+    expect(result).to.equal(true);
+  });
+
+  it('should check if a user exists and return false if it doesnt', async () => {
+    sinon.stub(repository.Model, "count")
+      .withArgs({name: new RegExp('Not Existent', 'i')})
+      .returns(Promise.resolve(0));
+
+    let result = await repository.exists('Not Existent');
+
+    repository.Model.count.restore();
+
+    expect(result).to.equal(false);
   });
 
 });
